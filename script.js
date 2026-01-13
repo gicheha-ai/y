@@ -43,7 +43,7 @@ const services = [
         tags: ["Blogs", "Articles", "SEO", "Creative"]
     },
     {
-        id: "copywriting",
+        id: "Copywriting",
         title: "Copywriting",
         description: "Persuasive copy that converts visitors into customers.",
         icon: "fas fa-edit",
@@ -85,14 +85,14 @@ const services = [
         tags: ["Support", "CRM", "Communication", "Satisfaction"]
     },
     {
-        id: "accounting",
+        id: "Accounting",
         title: "Accounting",
         description: "Accurate financial record-keeping and reporting.",
         icon: "fas fa-calculator",
         tags: ["Bookkeeping", "Tax", "Financial Statements"]
     },
     {
-        id: "bookkeeping",
+        id: "Bookkeeping",
         title: "Bookkeeping",
         description: "Organized financial tracking for business insights.",
         icon: "fas fa-book",
