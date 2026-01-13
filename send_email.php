@@ -4,18 +4,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $service_name = htmlspecialchars($_POST['service_name']);
     $client_name = htmlspecialchars($_POST['client_name']);
     $email = htmlspecialchars($_POST['email']);
-    $phone = htmlspecialchars($_POST['phone']);
-    $company = htmlspecialchars($_POST['company']);
-    $budget = htmlspecialchars($_POST['budget']);
-    $timeline = htmlspecialchars($_POST['timeline']);
+    $phone = htmlspecialchars($_POST['phone'] ?? '');
+    $company = htmlspecialchars($_POST['company'] ?? '');
+    $budget = htmlspecialchars($_POST['budget'] ?? '');
+    $timeline = htmlspecialchars($_POST['timeline'] ?? '');
     $project_details = htmlspecialchars($_POST['project_details']);
-    $additional_info = htmlspecialchars($_POST['additional_info']);
+    $additional_info = htmlspecialchars($_POST['additional_info'] ?? '');
     
-    // Email settings
+    // ====== 1. SAVE TO FILE (BACKUP - ALWAYS WORKS) ======
+    $submission = [
+        'timestamp' => date('Y-m-d H:i:s'),
+        'service' => $service_name,
+        'client' => $client_name,
+        'email' => $email,
+        'phone' => $phone,
+        'company' => $company,
+        'budget' => $budget,
+        'timeline' => $timeline,
+        'details' => $project_details,
+        'additional' => $additional_info
+    ];
+    
+    // Append to submissions file
+    file_put_contents('submissions.txt', json_encode($submission) . PHP_EOL, FILE_APPEND);
+    
+    // ====== 2. TRY TO SEND EMAIL (MAY NOT WORK ON FREE TIER) ======
     $to = "gichehalawrence@gmail.com";
     $subject = "New Quote Request: $service_name";
     
-    // Email content
+    // Email content (HTML version - same as before)
     $message = "
     <html>
     <head>
@@ -82,23 +99,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $headers .= "Reply-To: $email" . "\r\n";
     $headers .= "X-Mailer: PHP/" . phpversion();
     
-    // Send email
-    if (mail($to, $subject, $message, $headers)) {
-        // Success - redirect to thank you page
+    // Try to send email (suppress errors with @)
+    $email_sent = @mail($to, $subject, $message, $headers);
+    
+    // ====== 3. SHOW SUCCESS MESSAGE TO USER ======
+    if ($email_sent) {
+        // Email sent successfully
         echo '<script>
             alert("Thank you! Your quote request has been sent successfully. I will contact you within 24 hours.");
-            window.location.href = "../index.html";
+            window.location.href = "index.html";
         </script>';
     } else {
-        // Error
+        // Email failed, but data was saved to file
         echo '<script>
-            alert("Sorry, there was an error sending your message. Please try again or email me directly at gichehalawrence@gmail.com");
-            window.history.back();
+            alert("Thank you! Your quote request has been received. I have saved your details and will contact you at ' . $email . ' within 24 hours.");
+            window.location.href = "index.html";
         </script>';
     }
+    
 } else {
     // Not a POST request
-    header("Location: ../index.html");
+    header("Location: index.html");
     exit();
 }
 ?>
